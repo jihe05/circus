@@ -10,6 +10,8 @@ TagManager:
   - BackCircus
   - CuircusTent
   - BackCuircusTent
+  - clothes
+  - desk
   layers:
   - Default
   - TransparentFX

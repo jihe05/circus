@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 public class PlayerMove : MonoBehaviour
@@ -49,6 +50,7 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
+    /*
     private Dictionary<string, Vector2> teleportPositions = new Dictionary<string, Vector2>()
     {
         { "home", new Vector2(-80, -4) },
@@ -59,11 +61,73 @@ public class PlayerMove : MonoBehaviour
         { "BackCuircusTent", new Vector2(18f, 23f) }
     };
 
+    private Dictionary<string , string> interaction = new Dictionary<string, string>()
+    {
+         { "clothes", "옷 사이에 세미가 숨겨둔 돈이 있다." },
+          { "desk", "세미의 일기장이있다." }
+
+    };
+    
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (teleportPositions.TryGetValue(collision.collider.tag, out Vector2 newPosition))
         {
             transform.position = newPosition;
         }
+        if (interaction.TryGetValue(collision.collider.tag, out string naration))
+        {
+            InteractionNarration.instance.Narration(naration);
+
+        }
     }
+
+    */
+  
+        public InteractionData[] interactions = new InteractionData[]
+        {
+           new InteractionData { tag = "home", position = new Vector2(-80, -4) },
+           new InteractionData { tag = "Backhome", position = new Vector2(-9.5f, -4.5f) },
+           new InteractionData { tag = "Circus", position = new Vector2(101, -8) },
+           new InteractionData { tag = "BackCircus", position = new Vector2(18f, 23f)},
+           new InteractionData { tag = "clothes", narration = "옷 사이에 세미가 숨겨둔 돈이 있다." , checbox = "돈을 꺼내시겠습니까?"},
+           new InteractionData { tag = "desk", narration = "세미의 일기장이 있다." , checbox = "일기장을 읽으시겠습니까?"}
+        };
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            string collidedTag = collision.collider.tag;
+
+            foreach (var interaction in interactions)
+            {
+                if (interaction.tag == collidedTag)
+                {
+                    // 위치 변경 (텔레포트가 필요한 경우)
+                    if (interaction.position != Vector2.zero)
+                    {
+                        transform.position = interaction.position;
+                    }
+
+                    // 대사 출력 (있는 경우만)
+                    if (!string.IsNullOrEmpty(interaction.narration))
+                    {
+                        InteractionNarration.instance.Narration(interaction.narration, interaction.checbox);
+                }
+
+                    break; // 찾았으면 더 이상 반복할 필요 없음
+                }
+            }
+        }
+
+    }
+
+
+  public class InteractionData
+  {
+    public string tag;        
+    public Vector2 position;  
+    public string narration;
+    public string checbox;
 }
+
+
+     
