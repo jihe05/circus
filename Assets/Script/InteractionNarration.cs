@@ -38,12 +38,12 @@ public class InteractionNarration : MonoBehaviour
         }
     }
 
-    public void Narration(string _narration, string _checkBox, float duration = 3f)
+    public void Narration(string _narration, string _checkBox)
     {
         nowCheckBoxText = _checkBox;
         narrationText.text = _narration;
         isNarrationActive = true;
-        ActivateForSeconds(narration, nowCheckBoxText, duration);
+        ActivateForSeconds(narration, nowCheckBoxText);
     }
 
     public void Checkbox(string nowCheckBoxText)
@@ -53,7 +53,7 @@ public class InteractionNarration : MonoBehaviour
         checkBoxText.text = nowCheckBoxText;
     }
 
-    public void ActivateForSeconds(GameObject obj, string _checkBox, float duration = 3f)
+    public void ActivateForSeconds(GameObject obj, string _checkBox)
     {
         if (obj == null) return;
         obj.SetActive(true);
@@ -63,12 +63,12 @@ public class InteractionNarration : MonoBehaviour
             StopCoroutine(currentCoroutine);
         }
 
-        currentCoroutine = StartCoroutine(DeactivateAfterTime(obj, duration, _checkBox));
+        currentCoroutine = StartCoroutine(DeactivateAfterTime(obj, _checkBox));
     }
 
-    private IEnumerator DeactivateAfterTime(GameObject obj, float delay, string _checkBox)
+    private IEnumerator DeactivateAfterTime(GameObject obj, string _checkBox)
     {
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSeconds(2);
         SkipNarration(); 
     }
 
