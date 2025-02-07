@@ -6,112 +6,102 @@ using UnityEngine.UIElements;
 
 public class PlayerMove : MonoBehaviour
 {
-   [SerializeField] private float speed = 5f;
-    Vector2 direction;
-   
+    [SerializeField] private float speed;
+    float h;
+    float v;
+    bool isHorizontal = false;
 
     Rigidbody2D rigid;
-
-    Camera cam;
+  
     Animator moveAni;
 
-    private enum PlayerState { Idle = 0, Up = 1, Down = 2, Side = 3 }
-    private PlayerState currentState = PlayerState.Idle;
+
 
     void Awake()
     {
-        cam = FindAnyObjectByType<Camera>();
         rigid = GetComponent<Rigidbody2D>();
         moveAni = GetComponent<Animator>();
-
     }
 
-    void Update()
+    private void Update()
     {
-        cam.transform.position = new Vector3(transform.position.x, transform.position.y, -17f); ;
-        PlayerState newState = PlayerState.Idle;
 
-        // 키 입력 처리
-        if (Input.GetKey(KeyCode.W))
-        {
-            direction = Vector2.up;
-            newState = PlayerState.Up;
+        //움직임 값
+        h = Input.GetAxisRaw("Horizontal");
+        v = Input.GetAxisRaw("Vertical");
+
+        //위아래 체크
+        bool hDown = Input.GetButtonDown("Horizontal");
+        bool vDown = Input.GetButtonDown("Vertical");
+        bool hUp = Input.GetButtonUp("Horizontal");
+        bool vUp = Input.GetButtonUp("Vertical");
+
+        //isHorizontal 체트 움직임
+        if (hDown)
+            isHorizontal = true;
+        else if (vDown)
+            isHorizontal = false;
+        else if(hUp || vUp)
+            isHorizontal = h != 0;
+
+        //애니메이션
+        if (moveAni.GetInteger("InputH") != h){
+            moveAni.SetBool("isChange", true);
+            moveAni.SetInteger("InputH", (int)h);
         }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            direction = Vector2.down;
-            newState = PlayerState.Down;
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            direction = Vector2.left;
-            newState = PlayerState.Side;
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            direction = Vector2.right;
-            newState = PlayerState.Side;
+        else if (moveAni.GetInteger("InputV") != v){
+            moveAni.SetBool("isChange", true);
+            moveAni.SetInteger("InputV", (int)v);
         }
         else
-        {
-            direction = Vector2.zero;
-        }
-
-        if (newState != currentState)
-        {
-            moveAni.SetInteger("State", (int)newState);
-            currentState = newState;
-        }
+            moveAni.SetBool("isChange", false);
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        // 이동 처리
-        rigid.velocity = direction * speed;
-
-        if (direction.x != 0)
-        {
-            transform.localScale = new Vector3(Mathf.Sign(-direction.x), 1f, 1f);
-        }
+        //움직임
+        Vector2 moveVec = isHorizontal ? new Vector2(h, 0) : new Vector2(0, v);
+        rigid.velocity = moveVec * speed;
     }
 
-        public InteractionData[] interactions = new InteractionData[]
-        {
-           new InteractionData { tag = "home", position = new Vector2(-80, -4) },
+    public InteractionData[] interactions = new InteractionData[]
+    {
+           new InteractionData { tag = "home", position = new Vector2(-80, -6) },
            new InteractionData { tag = "Backhome", position = new Vector2(-9.5f, -4.5f) },
            new InteractionData { tag = "Circus", position = new Vector2(101, -8) },
            new InteractionData { tag = "BackCircus", position = new Vector2(18f, 23f)},
            new InteractionData { tag = "clothes", narration = "옷 사이에 세미가 숨겨둔 돈이 있다." , checbox = "돈을 꺼내시겠습니까?"},
            new InteractionData { tag = "desk", narration = "세미의 일기장이 있다." , checbox = "일기장을 읽으시겠습니까?"}
-        };
+    };
 
-        private void OnCollisionEnter2D(Collision2D collision)
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        string collidedTag = collision.collider.tag;
+
+        foreach (var interaction in interactions)
         {
-            string collidedTag = collision.collider.tag;
-
-            foreach (var interaction in interactions)
+            if (interaction.tag == collidedTag)
             {
-                if (interaction.tag == collidedTag)
+                if (interaction.position != Vector2.zero)
                 {
-                    if (interaction.position != Vector2.zero)
-                    {
-                        transform.position = interaction.position;
-                    }
-
-                    if (!string.IsNullOrEmpty(interaction.narration))
-                    {
-                        InteractionNarration.instance.Narration(interaction.narration, interaction.checbox);
-                    }
-
-                    break;
+                    transform.position = interaction.position;
                 }
+
+                if (!string.IsNullOrEmpty(interaction.narration))
+                {
+                    InteractionNarration.instance.Narration(interaction.narration, interaction.checbox);
+                }
+
+                break;
             }
         }
-
     }
 
+}
 
-  public class InteractionData
+
+public class InteractionData
   {
     public string tag;        
     public Vector2 position;  
