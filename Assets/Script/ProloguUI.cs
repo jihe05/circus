@@ -57,12 +57,6 @@ public class ProloguUI : MonoBehaviour
 
     private void EndPrologue()
     {
-        GameManager.Instance.SeanChangePoint();
-        Invoke("DisableGameObject", 1f);
-    }
-
-    private void DisableGameObject()
-    {
-        gameObject.SetActive(false);
+        GameManager.Instance.StartGameSetting();
     }
 }

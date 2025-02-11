@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-   
+
     public static GameManager Instance;
 
     [SerializeField]
@@ -21,20 +21,25 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Update()
-    {
-
-    }
-
-    public void PlayerMoveStop()
-    {
-       playerMove.enabled = false;
-    }
-
-    public void SeanChangePoint()
+    public void StartGameSetting()
     {
         animator.SetTrigger("Scean");
+        playerMove.transform.position = new Vector3(-134.3f, 9.3f, 0);
+        StartCoroutine("StartGame");
+    }
+
+    IEnumerator StartGame()
+    {
+        yield return new WaitForSeconds(0.5f);
+        prologue.SetActive(false);
+        yield return new WaitForSeconds(0.5f);
+        TalkManager.Instance.MonologueId(1000);
     }
 
 
+
+    
 }
+
+
+

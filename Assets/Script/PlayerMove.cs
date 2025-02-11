@@ -6,16 +6,17 @@ using UnityEngine.UIElements;
 
 public class PlayerMove : MonoBehaviour
 {
+    [Header("움직임")]
     [SerializeField] private float speed;
     float h;
     float v;
     bool isHorizontal = false;
-
     Rigidbody2D rigid;
-  
     Animator moveAni;
 
-
+    [Header("상호작용")]
+    Vector3 dirVec;
+    GameObject scanObject;
 
     void Awake()
     {
@@ -25,16 +26,15 @@ public class PlayerMove : MonoBehaviour
 
     private void Update()
     {
-
         //움직임 값
-        h = Input.GetAxisRaw("Horizontal");
-        v = Input.GetAxisRaw("Vertical");
+        h = TalkManager.Instance.isAction ? 0 : Input.GetAxisRaw("Horizontal");
+        v = TalkManager.Instance.isAction ? 0 : Input.GetAxisRaw("Vertical");
 
         //위아래 체크
-        bool hDown = Input.GetButtonDown("Horizontal");
-        bool vDown = Input.GetButtonDown("Vertical");
-        bool hUp = Input.GetButtonUp("Horizontal");
-        bool vUp = Input.GetButtonUp("Vertical");
+        bool hDown = TalkManager.Instance.isAction ? false : Input.GetButtonDown("Horizontal");
+        bool vDown = TalkManager.Instance.isAction ? false : Input.GetButtonDown("Vertical");
+        bool hUp = TalkManager.Instance.isAction ? false : Input.GetButtonUp("Horizontal");
+        bool vUp = TalkManager.Instance.isAction ? false : Input.GetButtonUp("Vertical");
 
         //isHorizontal 체트 움직임
         if (hDown)
@@ -55,6 +55,25 @@ public class PlayerMove : MonoBehaviour
         }
         else
             moveAni.SetBool("isChange", false);
+
+        //Direction
+        if (vDown && v == 1)
+            dirVec = Vector3.up;
+        else if (vDown && v == -1)
+            dirVec = Vector3.down;
+        else if (hDown && h == -1)
+            dirVec = Vector3.left;
+        else if(hDown && h == 1)
+            dirVec = Vector3.right;
+
+        //상호작용 키
+        if (Input.GetKeyDown(KeyCode.F) && scanObject == null && TalkManager.Instance.isAction == true)
+            TalkManager.Instance.Monologue();
+        else if (Input.GetKeyDown(KeyCode.F) && scanObject != null)
+            TalkManager.Instance.Action(scanObject);
+       else if (Input.GetMouseButtonDown(0) && scanObject != null)
+            Inventory.Instance.RemoveItem(scanObject);
+
     }
 
     private void FixedUpdate()
@@ -62,52 +81,25 @@ public class PlayerMove : MonoBehaviour
         //움직임
         Vector2 moveVec = isHorizontal ? new Vector2(h, 0) : new Vector2(0, v);
         rigid.velocity = moveVec * speed;
+
+        //레이
+        Debug.DrawRay(rigid.position, dirVec * 0.7f, Color.red);
+        RaycastHit2D objRayHit = Physics2D.Raycast(rigid.position, dirVec, 0.7f, LayerMask.GetMask("Object"));
+
+        if (objRayHit.collider != null)
+            scanObject = objRayHit.collider.gameObject;
+        else
+            scanObject = null;
+
+
     }
-
-    public InteractionData[] interactions = new InteractionData[]
-    {
-           new InteractionData { tag = "home", position = new Vector2(-80, -6) },
-           new InteractionData { tag = "Backhome", position = new Vector2(-9.5f, -4.5f) },
-           new InteractionData { tag = "Circus", position = new Vector2(101, -8) },
-           new InteractionData { tag = "BackCircus", position = new Vector2(18f, 23f)},
-           new InteractionData { tag = "clothes", narration = "옷 사이에 세미가 숨겨둔 돈이 있다." , checbox = "돈을 꺼내시겠습니까?"},
-           new InteractionData { tag = "desk", narration = "세미의 일기장이 있다." , checbox = "일기장을 읽으시겠습니까?"}
-    };
-
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        string collidedTag = collision.collider.tag;
-
-        foreach (var interaction in interactions)
-        {
-            if (interaction.tag == collidedTag)
-            {
-                if (interaction.position != Vector2.zero)
-                {
-                    transform.position = interaction.position;
-                }
-
-                if (!string.IsNullOrEmpty(interaction.narration))
-                {
-                    InteractionNarration.instance.Narration(interaction.narration, interaction.checbox);
-                }
-
-                break;
-            }
-        }
+        Movelocation.Instance.SetTriggerPlayer(collision.collider);
     }
 
+
 }
-
-
-public class InteractionData
-  {
-    public string tag;        
-    public Vector2 position;  
-    public string narration;
-    public string checbox;
-}
-
 
      
