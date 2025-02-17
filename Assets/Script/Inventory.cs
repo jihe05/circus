@@ -85,15 +85,33 @@ public class Inventory : MonoBehaviour
         for (int i = 0; i < itemToggles.Count; i++)
         {
             if (objData.itemData == itemToggles[i].GetComponent<Item>().itemData) // 아이템 데이터 비교
-            {
-                // 아이템 비활성화 및 삭제
-                scanObject.SetActive(false);
-                Destroy(itemToggles[i].gameObject);
+            { 
+                if (objData.itemData.isStackable)
+                {
+                    Debug.Log(objData.itemData.maxStack);
+                    objData.itemData.maxStack--;
+                    if (objData.itemData.maxStack == 0)
+                    {
+                        scanObject.SetActive(false);
+                        Destroy(itemToggles[i].gameObject);
 
-                // 리스트에서 삭제
-                itemToggles.RemoveAt(i);
-                break; // 한 번 삭제하면 더 이상 확인할 필요 없음
+                        // 리스트에서 삭제
+                        itemToggles.RemoveAt(i);
+                        break;
+                    }
+                }
+                if(!objData.itemData.isStackable)
+                {
+
+                    scanObject.SetActive(false);
+                    Destroy(itemToggles[i].gameObject);
+
+                    // 리스트에서 삭제
+                    itemToggles.RemoveAt(i);
+                    break;
+                }
             }
+         
         }
     }
 }

@@ -30,6 +30,8 @@ public class Movelocation : MonoBehaviour
         playerMoveDic.Add(1, new Vector3(-125f, 8f, 0f));
         playerMoveDic.Add(2, new Vector3(-40f, 2.5f, 0f));
         playerMoveDic.Add(3, new Vector3(-90f, 0f, 0f));
+        playerMoveDic.Add(4, new Vector3(52f, 43.5f, 0f));
+        playerMoveDic.Add(5, new Vector3(-35f, 1f, 0f));
     }
 
     public void SetTriggerPlayer(Collider2D collider)

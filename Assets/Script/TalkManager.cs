@@ -49,6 +49,9 @@ public class TalkManager : MonoBehaviour
         talkData.Add(14, new string[] { "문이 잠겨있다."});
         talkData.Add(15, new string[] { "옷장 구석에 돈뭉치가 있다." });
         talkData.Add(16, new string[] { "버스 정류장이다, 하지만 버스는 오지 않는다." , "세미 \n 숨겨둔 자전거를 타야겠어" });
+        talkData.Add(17, new string[] { "그냥 평범한 풀숲이다." });
+        talkData.Add(18, new string[] { "이상하게 튀어나온 바위...", "세미 \n 여기에 자전거를 숨겨놨었지..." });
+        talkData.Add(19, new string[] { "10000원입니다." });
 
 
     }
