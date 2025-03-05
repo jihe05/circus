@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,7 @@ public class Inventory : MonoBehaviour
 
     private List<Toggle> itemToggles = new List<Toggle>();
 
+    Item itemComponent;
 
     private void Awake()
     {
@@ -20,7 +22,7 @@ public class Inventory : MonoBehaviour
 
     private void Update()
     {
-        
+
     }
 
     public void AddItem(ItemData itemData)
@@ -30,12 +32,11 @@ public class Inventory : MonoBehaviour
         newItem.transform.localPosition = Vector3.zero;
 
         // Item 컴포넌트를 가져와 itemData 적용
-        Item itemComponent = newItem.GetComponent<Item>();
-        ToggleEventAdd(itemData, newItem, itemComponent);
+        itemComponent = newItem.GetComponent<Item>();
+        ToggleEventAdd(itemData, newItem);
     }
-        
-        
-    private void ToggleEventAdd(ItemData itemData, GameObject newItem, Item itemComponent)
+
+    private void ToggleEventAdd(ItemData itemData, GameObject newItem)
     {
         if (itemComponent != null)
         {
@@ -61,10 +62,6 @@ public class Inventory : MonoBehaviour
                         }
 
                     }
-                    else
-                    {
-
-                    }
                 });
             }
             else
@@ -73,6 +70,7 @@ public class Inventory : MonoBehaviour
             }
         }
     }
+    
 
     public void RemoveItem(GameObject scanObject)
     {
@@ -84,15 +82,18 @@ public class Inventory : MonoBehaviour
         // itemToggles 리스트에서 해당 아이템을 제거
         for (int i = 0; i < itemToggles.Count; i++)
         {
-            if (objData.itemData == itemToggles[i].GetComponent<Item>().itemData) // 아이템 데이터 비교
-            { 
+            if (objData.itemData == itemToggles[i].GetComponent<Item>().itemData)
+            {
                 if (objData.itemData.isStackable)
                 {
-                    Debug.Log(objData.itemData.maxStack);
-                    objData.itemData.maxStack--;
+                    if (objData.itemData.maxStack > 0)
+                    {
+                        objData.itemData.maxStack--;
+                        itemComponent.SetItemData(objData.itemData);
+                    }
+
                     if (objData.itemData.maxStack == 0)
                     {
-                        scanObject.SetActive(false);
                         Destroy(itemToggles[i].gameObject);
 
                         // 리스트에서 삭제
@@ -100,18 +101,19 @@ public class Inventory : MonoBehaviour
                         break;
                     }
                 }
-                if(!objData.itemData.isStackable)
+                else // 스택 불가능한 아이템
                 {
-
-                    scanObject.SetActive(false);
+                
                     Destroy(itemToggles[i].gameObject);
-
                     // 리스트에서 삭제
                     itemToggles.RemoveAt(i);
                     break;
                 }
+                scanObject.SetActive(false);
+
+
             }
-         
         }
     }
 }
+

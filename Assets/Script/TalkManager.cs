@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,6 +20,7 @@ public class TalkManager : MonoBehaviour
     Dictionary<int, string[]> talkData;
 
     int monologueID;
+    GameObject[] activObj;
 
     private void Awake()
     {
@@ -33,8 +35,8 @@ public class TalkManager : MonoBehaviour
     {
          scanObject = scanobj;
          ObjData objData = scanobj.GetComponent<ObjData>();
-         Talk(objData.id, objData.isNap, objData.checkBoxT, objData.activobj, objData.getItem , objData.itemData);
-      
+        Talk(objData.id, objData.checkBoxT, objData.activobj, objData.getItem, objData.itemData);
+
         talkPanal.SetActive(isAction);
     }
 
@@ -52,6 +54,7 @@ public class TalkManager : MonoBehaviour
         talkData.Add(17, new string[] { "그냥 평범한 풀숲이다." });
         talkData.Add(18, new string[] { "이상하게 튀어나온 바위...", "세미 \n 여기에 자전거를 숨겨놨었지..." });
         talkData.Add(19, new string[] { "10000원입니다." });
+        talkData.Add(20, new string[] { "세미 \n 와..서커스공연장.. 정말 오랜만이야!", "세미 \n 혁 드디어 시작하려나봐 어서 자리에 앉자!" });
 
 
     }
@@ -64,7 +67,7 @@ public class TalkManager : MonoBehaviour
             return talkData[id][talkindex];
     }
 
-    public void Talk(int id, bool isNpc, string checkBoxT, bool activobj, bool getItem, ItemData itemData)
+    public void Talk(int id, string checkBoxT, GameObject[] activobj, bool getItem, ItemData itemData)
     {
         string talkData = GetTalk(id, talkindex);
 
@@ -75,8 +78,6 @@ public class TalkManager : MonoBehaviour
 
             if (checkBoxT != "0")
                 Checkbox(checkBoxT);
-            if (activobj)
-                ActiveGameObject(scanObject);
             if (getItem)
             {
                 scanObject.layer = LayerMask.NameToLayer("Default");
@@ -86,17 +87,25 @@ public class TalkManager : MonoBehaviour
             return;
         }
 
-        UpdateTalkUI(talkData, isNpc);
+        UpdateTalkUI(talkData);
 
         isAction = true;
         talkindex++;
+        if (activobj != null)
+        {
+            for (int i = 0; i < activobj.Length; i++)
+            {
+                activObj[i] = activobj[i];
+            }
+        }
+        
     }
 
-    private void UpdateTalkUI(string talkData, bool isNpc)
+    private void UpdateTalkUI(string talkData)
     {
         talkText.text = talkData;
 
-        if (isNpc)
+        if (talkText.text.Contains("세미"))
         {
             portraitImg.color = new Color(1, 1, 1, 1);
         }
@@ -147,33 +156,21 @@ public class TalkManager : MonoBehaviour
         talkPanal.SetActive(false);
     }
 
-    public void OnClickButtonYes(GameObject Obj)
+    public void OnClickButtonYes()
     {
-        Obj.SetActive(true);
+        if (activObj == null)
+            return;
+
+        for (int i = 0; i < activObj.Length; i++)
+        {
+            if (activObj[i].activeSelf == false)
+                activObj[i].SetActive(true);
+           else if (activObj[i].activeSelf == true)
+                activObj[i].SetActive(false);
+        }
     }
 
-    public void ActiveGameObject(GameObject scanObject)
-    {
-        //아이템을 먹으면 오브젝트의 자식 오브젝트를 활성화 하거나 비활성화 함
-        if (scanObject == null) return;
 
-        Transform[] children = scanObject.GetComponentsInChildren<Transform>(true);
-
-        foreach (Transform child in children)
-        {
-            if (child == scanObject.transform) continue; // 부모 오브젝트는 제외
-            child.gameObject.SetActive(!child.gameObject.activeSelf);
-        }
-
-        //자식이배열이 비어잇으면
-        if (children.Length <= 1)
-        {
-            scanObject.SetActive(false);
-        }
-
-
-
-    }
 
 }
 

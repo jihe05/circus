@@ -9,6 +9,7 @@ TagManager:
   - BackCircus
   - Backhome
   - home
+  - Tent
   layers:
   - Default
   - TransparentFX

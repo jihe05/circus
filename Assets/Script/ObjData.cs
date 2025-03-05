@@ -5,9 +5,8 @@ using UnityEngine;
 public class ObjData : MonoBehaviour
 {
    public int id;
-   public bool isNap;
    public string checkBoxT;
-    public bool activobj;
+    public GameObject[] activobj;
     public bool getItem;
     public ItemData itemData; 
 }

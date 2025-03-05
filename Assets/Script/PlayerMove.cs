@@ -71,8 +71,8 @@ public class PlayerMove : MonoBehaviour
             TalkManager.Instance.Monologue();
         else if (Input.GetKeyDown(KeyCode.F) && scanObject != null)
             TalkManager.Instance.Action(scanObject);
-       else if (Input.GetMouseButtonDown(0) && scanObject != null)
-            Inventory.Instance.RemoveItem(scanObject);
+        else if (Input.GetMouseButtonDown(0) && scanObject != null)
+             Inventory.Instance.RemoveItem(scanObject);
 
     }
 
@@ -97,6 +97,13 @@ public class PlayerMove : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Movelocation.Instance.SetTriggerPlayer(collision.collider);
+
+
+        if (collision.collider.CompareTag("Tent"))
+        {
+            GameObject[] activobj = { scanObject.transform.GetChild(0).gameObject};
+            TalkManager.Instance.Talk(20, "0", activobj, false, null);
+        }
     }
 
 
