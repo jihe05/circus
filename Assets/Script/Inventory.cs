@@ -100,17 +100,19 @@ public class Inventory : MonoBehaviour
                         itemToggles.RemoveAt(i);
                         break;
                     }
+                    scanObject.SetActive(false);
+
                 }
                 else // 스택 불가능한 아이템
                 {
-                
                     Destroy(itemToggles[i].gameObject);
                     // 리스트에서 삭제
                     itemToggles.RemoveAt(i);
+                    scanObject.SetActive(false);
+
                     break;
                 }
-                scanObject.SetActive(false);
-
+              
 
             }
         }

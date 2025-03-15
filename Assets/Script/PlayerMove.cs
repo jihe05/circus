@@ -98,12 +98,6 @@ public class PlayerMove : MonoBehaviour
     {
         Movelocation.Instance.SetTriggerPlayer(collision.collider);
 
-
-        if (collision.collider.CompareTag("Tent"))
-        {
-            GameObject[] activobj = { scanObject.transform.GetChild(0).gameObject};
-            TalkManager.Instance.Talk(20, "0", activobj, false, null);
-        }
     }
 
 
