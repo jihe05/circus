@@ -7,7 +7,7 @@ public class TalkManager : MonoBehaviour
 {
     public static TalkManager Instance { get; private set; }
 
-    [SerializeField] private GameObject talkPanal;
+    [SerializeField] private GameObject talkPanel;
     [SerializeField] private Image portraitImg;
     [SerializeField] private Text talkText;
     [SerializeField] private GameObject scanObject;
@@ -15,10 +15,10 @@ public class TalkManager : MonoBehaviour
     public bool isAction;
     public int talkindex;
 
-    Dictionary<int, string[]> talkData = new Dictionary<int, string[]>();
+    private Dictionary<int, string[]> talkData = new Dictionary<int, string[]>();
 
-    int monologueID;
-    GameObject[] activObj;
+    private int monologueID;
+    private GameObject[] activObj;
 
     private void Awake()
     {
@@ -30,19 +30,20 @@ public class TalkManager : MonoBehaviour
 
     public void Action(GameObject scanobj)
     {
-        if (scanobj == null) return; // Null 체크 추가
+        if (scanobj == null) return;
 
         scanObject = scanobj;
         ObjData objData = scanobj.GetComponent<ObjData>();
-        if (objData == null) return; // ObjData가 없으면 실행하지 않음
+        if (objData == null) return;
 
-        Talk(objData.id, objData.checkBoxT, objData.activobj, objData.getItem, objData.itemData);
-        talkPanal.SetActive(isAction);
+        Talk(objData.id, objData.checkBoxT, objData.activobj, objData.getItem, objData.itemData, objData.notTolk);
+
+            talkPanel.SetActive(isAction);
     }
 
-    public void GenerateData()
+    private void GenerateData()
     {
-        talkData.Add(1000, new string[] { "세미 \n 끄으.. 또아침인가", "세미 \n 오늘 꿈에서 할머니를 본 기분이 들어" });
+        talkData.Add(1000, new string[] { "세미 \n 끄으.. 또 아침인가", "세미 \n 오늘 꿈에서 할머니를 본 기분이 들어" });
         talkData.Add(10, new string[] { "세미의 옷장이다." });
         talkData.Add(11, new string[] { "테이블 위에 세미의 일기장이 보인다." });
         talkData.Add(12, new string[] { "TV \n오늘부터 한 달간 ㅇㅇ동네에서 서커스가 열린다 합니다!", "세미 \n우리 동네잖아?", "세미 \n 당장 출발하자!", "세미 \n 내 옷장에 돈을 모아놨었는데.." });
@@ -53,74 +54,84 @@ public class TalkManager : MonoBehaviour
         talkData.Add(17, new string[] { "그냥 평범한 풀숲이다." });
         talkData.Add(18, new string[] { "이상하게 튀어나온 바위...", "세미 \n 여기에 자전거를 숨겨놨었지..." });
         talkData.Add(19, new string[] { "10000원입니다." });
-        talkData.Add(20, new string[] { "세미 \n 와..서커스공연장.. 정말 오랜만이야!", "세미 \n 드디어 시작하려나봐 어서 자리에 앉자!" });
+        talkData.Add(20, new string[] { "세미 \n 와.. 서커스 공연장.. 정말 오랜만이야!", "세미 \n 드디어 시작하려나봐, 어서 자리에 앉자!" });
+        talkData.Add(21, new string[] { "잭 \n 즐거운 관람 되셨기를..." });
     }
 
-    string GetTalk(int id, int talkindex)
+    private string GetTalk(int id, int talkindex)
     {
-        if (!talkData.ContainsKey(id)) return null; // ID가 없는 경우 예외 방지
-        if (talkindex >= talkData[id].Length) return null; // talkindex가 범위를 벗어나면 null 반환
+        if (!talkData.ContainsKey(id)) return null;
+        if (talkindex < 0 || talkindex >= talkData[id].Length) return null;
 
         return talkData[id][talkindex];
     }
 
-
-    public void Talk(int id, string checkBoxT, GameObject[] activobj, bool getItem, ItemData itemData)
+    public void Talk(int id, string checkBoxT, GameObject[] activobj, bool getItem, ItemData itemData, bool notTolk)
     {
         string currentTalk = GetTalk(id, talkindex);
 
+        // 대화가 없으면 처리
         if (currentTalk == null)
         {
-            isAction = false;
-            talkindex = 0;
-
-            if (checkBoxT != "0")
-                Checkbox(checkBoxT);
-            if (getItem && scanObject != null) // scanObject가 null이 아닌 경우에만 실행
-            {
-                scanObject.layer = LayerMask.NameToLayer("Default");
-                Inventory.Instance.AddItem(itemData);
-            }
-            
-            //만약 배열의 오브젝트가 존재 한다면 
-            if (activobj != null && activobj.Length > 0)
-            {
-                if (checkBoxT != "0")
-                {
-                    activObj = new GameObject[activobj.Length];
-                    for (int i = 0; i < activobj.Length; i++)
-                    {
-                        activObj[i] = activobj[i];
-                    }
-                }
-               
-                if (checkBoxT == "0")
-                {
-                    for (int i = 0; i < activobj.Length; i++)
-                    {
-                        Debug.Log("d");
-                        scanObject.layer = LayerMask.NameToLayer("Default");
-                        activobj[i].SetActive(!activobj[i].activeSelf);
-                    }
-                }
-                 
-            }
+            HandleInteraction(checkBoxT, activobj, getItem, itemData);
             return;
         }
 
-        UpdateTalkUI(currentTalk);
-        isAction = true;
-        talkindex++;
+        // notTolk가 true인 경우 대화창 비활성화
+        if (notTolk)
+        {
+            talkPanel.SetActive(false);  // 대화창 비활성화
+            HandleInteraction(checkBoxT, activobj, getItem, itemData);
+        }
+        else
+        {
+            UpdateTalkUI(currentTalk);
+            isAction = true;
+            talkindex++;
+        }
+    }
 
+    private void HandleInteraction(string checkBoxT, GameObject[] activobj, bool getItem, ItemData itemData)
+    {
+        isAction = false;
+        talkindex = 0;
 
+        // 체크박스 표시
+        if (checkBoxT != "0")
+            Checkbox(checkBoxT);
+
+        // 아이템 획득
+        if (getItem && scanObject != null)
+        {
+            scanObject.layer = LayerMask.NameToLayer("Default");
+            Inventory.Instance.AddItem(itemData);
+        }
+
+        // 오브젝트 활성화/비활성화 처리
+        if (activobj != null && activobj.Length > 0)
+        {
+            if (checkBoxT != "0")
+            {
+                activObj = new GameObject[activobj.Length];
+                activobj.CopyTo(activObj, 0);
+            }
+
+            if (checkBoxT == "0")
+            {
+                foreach (GameObject obj in activobj)
+                {
+                    if (obj != null) obj.SetActive(!obj.activeSelf);
+                }
+            }
+        }
     }
 
     private void UpdateTalkUI(string talkData)
     {
-        if (talkText == null) return; // 예외 방지
+        if (talkText == null) return;
 
         talkText.text = talkData;
-        portraitImg.color = talkText.text.Contains("세미") ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0);
+        portraitImg.color = talkData.Contains("세미") ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0);
     }
 
     public void MonologueId(int id)
@@ -136,14 +147,14 @@ public class TalkManager : MonoBehaviour
         if (currentTalk == null)
         {
             isAction = false;
-            talkPanal.SetActive(false);
+            talkPanel.SetActive(false);
             talkindex = 0;
             return;
         }
 
         talkText.text = currentTalk;
         portraitImg.color = new Color(1, 1, 1, 1);
-        talkPanal.SetActive(true);
+        talkPanel.SetActive(true);
         isAction = true;
         talkindex++;
     }
@@ -161,10 +172,9 @@ public class TalkManager : MonoBehaviour
     {
         isAction = false;
         if (checkbox != null) checkbox.SetActive(false);
-        if (talkPanal != null) talkPanal.SetActive(false);
+        if (talkPanel != null) talkPanel.SetActive(false);
     }
 
-    //Yes를 누르면 
     public void OnClickButtonYes()
     {
         if (activObj == null || activObj.Length == 0) return;

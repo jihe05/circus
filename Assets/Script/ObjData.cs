@@ -8,5 +8,6 @@ public class ObjData : MonoBehaviour
    public string checkBoxT;
     public GameObject[] activobj;
     public bool getItem;
-    public ItemData itemData; 
+    public ItemData itemData;
+    public bool notTolk;
 }
