@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum ItemType { Consumable , KeyItem }
+public enum ItemType { Consumable, fixtures}
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
 public class ItemData : ScriptableObject

@@ -15,6 +15,10 @@ public class Movelocation : MonoBehaviour
 
     [SerializeField] Animator sceanChangeAni;
 
+    //트리거 상호작용
+    [SerializeField] private GameObject scanObject;
+
+
     bool moveAble = false;
 
     private void Awake()
@@ -34,6 +38,8 @@ public class Movelocation : MonoBehaviour
         playerMoveDic.Add(5, new Vector3(-35f, 1f, 0f));
         playerMoveDic.Add(6, new Vector3(158f, 43f, 0f));
         playerMoveDic.Add(7, new Vector3(52f, 80f, 0f));
+        playerMoveDic.Add(8, new Vector3(54f, 118f, 0f));
+        playerMoveDic.Add(9, new Vector3(23f, 132f, 0f));
     }
 
     public void SetTriggerPlayer(Collider2D collider)
@@ -42,15 +48,16 @@ public class Movelocation : MonoBehaviour
         {
             if (colliders[i] == collider)
             {
-                int index = i; 
+                int index = i;
 
                 if (playerMoveDic.TryGetValue(index, out Vector3 targetPosition) || !moveAble)
                 {
                     StartCoroutine(SceanChange(targetPosition));
                 }
-                break; 
+                break;
             }
         }
+
     }
 
     public IEnumerator SceanChange(Vector3 targetPosition)
@@ -62,6 +69,43 @@ public class Movelocation : MonoBehaviour
         TalkManager.Instance.isAction = false;
     }
 
+
+    //트리거 상호작용
+    public void Action(Collider2D collision)
+    {
+        if (collision.CompareTag("moveCol"))
+        {
+            InteractiveCollider interactiveCollider = collision.GetComponent<InteractiveCollider>();
+            if (interactiveCollider == null) return;
+
+            Interaction(interactiveCollider.activobj, interactiveCollider.scriptObj);
+            collision.gameObject.tag = "Untagged";
+        }
+        else
+            return;
+    }
+
+    public void Interaction(GameObject[] activobj, GameObject scriptObj)
+    {
+        HomeTimeer homeTimeer;
+     
+        if (scriptObj != null)
+        { 
+            homeTimeer = scriptObj.GetComponent<HomeTimeer>();
+            homeTimeer.startGame = false;
+        }
+
+        if (activobj != null && activobj.Length > 0)
+        {
+            foreach (GameObject obj in activobj)
+            {
+                if (obj != null) obj.SetActive(!obj.activeSelf);
+            }
+        }
+        else
+            return;
+         
+    }
 }
 
 

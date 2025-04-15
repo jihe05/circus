@@ -10,15 +10,17 @@ TagManager:
   - Backhome
   - home
   - Tent
+  - moveCol
+  - telaport
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Target
   - Water
   - UI
   - Object
-  - 
+  - Player
   - 
   - 
   - 

@@ -1,6 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject prologue;
 
+    [SerializeField]
+    private GameObject homeTimeGame;
+   
     private void Awake()
     {
         Instance = this;
@@ -36,10 +39,4 @@ public class GameManager : MonoBehaviour
         TalkManager.Instance.MonologueId(1000);
     }
 
-
-
-    
 }
-
-
-

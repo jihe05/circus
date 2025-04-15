@@ -97,7 +97,11 @@ public class PlayerMove : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Movelocation.Instance.SetTriggerPlayer(collision.collider);
+    }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Movelocation.Instance.Action(collision);
     }
 
 

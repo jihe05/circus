@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +10,7 @@ public class Inventory : MonoBehaviour
 
     public GameObject group;
 
-    private List<Toggle> itemToggles = new List<Toggle>();
+   public List<Toggle> itemToggles = new List<Toggle>();
 
     Item itemComponent;
 
@@ -116,6 +115,20 @@ public class Inventory : MonoBehaviour
 
             }
         }
+    }
+
+    //아이템이 있으몀 True 없으면 Fales반환 메서드
+    public bool HasItem(string itemName)
+    {
+        foreach (var toggle in itemToggles)
+        {
+            Item item = toggle.GetComponent<Item>();
+            if (item != null && item.itemData.itemName == itemName)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

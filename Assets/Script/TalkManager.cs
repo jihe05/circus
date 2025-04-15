@@ -56,6 +56,9 @@ public class TalkManager : MonoBehaviour
         talkData.Add(19, new string[] { "10000원입니다." });
         talkData.Add(20, new string[] { "세미 \n 와.. 서커스 공연장.. 정말 오랜만이야!", "세미 \n 드디어 시작하려나봐, 어서 자리에 앉자!" });
         talkData.Add(21, new string[] { "잭 \n 즐거운 관람 되셨기를..." });
+        talkData.Add(22, new string[] { "잭 \n 즐거운 관람 되셨기를..." });
+        talkData.Add(23, new string[] { "세미 \n 누..누구세요?" });
+
     }
 
     private string GetTalk(int id, int talkindex)
