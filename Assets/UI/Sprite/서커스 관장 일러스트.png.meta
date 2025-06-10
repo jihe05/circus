@@ -155,8 +155,8 @@ TextureImporter:
       name: "\uC11C\uCEE4\uC2A4 \uAD00\uC7A5 \uC77C\uB7EC\uC2A4\uD2B8_2"
       rect:
         serializedVersion: 2
-        x: 84
-        y: 1411
+        x: 77
+        y: 1413
         width: 368
         height: 680
       alignment: 9
@@ -197,7 +197,7 @@ TextureImporter:
       name: "\uC11C\uCEE4\uC2A4 \uAD00\uC7A5 \uC77C\uB7EC\uC2A4\uD2B8_4"
       rect:
         serializedVersion: 2
-        x: 1030
+        x: 1035
         y: 1413
         width: 368
         height: 680

@@ -7,7 +7,7 @@ public class TalkManager : MonoBehaviour
 {
     public static TalkManager Instance { get; private set; }
 
-    [SerializeField] private GameObject talkPanel;
+    public GameObject talkPanel;
     [SerializeField] private Image portraitImg;
     [SerializeField] private Text talkText;
     [SerializeField] private GameObject scanObject;
@@ -40,6 +40,13 @@ public class TalkManager : MonoBehaviour
 
             talkPanel.SetActive(isAction);
     }
+
+    public void Activepenal()
+    {
+        talkindex = 0;
+        talkPanel.SetActive(false);
+    }
+
 
     private void GenerateData()
     {
@@ -76,20 +83,21 @@ public class TalkManager : MonoBehaviour
         // 대화가 없으면 처리
         if (currentTalk == null)
         {
+            talkText.text = null;
             HandleInteraction(checkBoxT, activobj, getItem, itemData);
             return;
         }
-
         // notTolk가 true인 경우 대화창 비활성화
         if (notTolk)
         {
+            Debug.Log(2);
+            talkText.text = null;
             talkPanel.SetActive(false);  // 대화창 비활성화
             HandleInteraction(checkBoxT, activobj, getItem, itemData);
         }
         else
         {
             UpdateTalkUI(currentTalk);
-            isAction = true;
             talkindex++;
         }
     }

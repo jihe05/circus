@@ -1,53 +1,63 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class NPCMove : MonoBehaviour
 {
-    public Transform[] targets; // 이동할 목표 지점들
-    public float moveSpeed = 2f; // 이동 속도
-    public Transform player; // 플레이어
+    public Transform[] targets;        // 이동할 목표 지점들
+    public float moveSpeed = 2f;       // 이동 속도
+    public Transform player;           // 플레이어
 
-    private int currentTargetIndex = 0; // 현재 목표 인덱스
-    private bool isMoving = false; // 이동 중인지 체크
-    private bool onMove = false; // 플레이어가 근처에 있는지 체크
-    Animator moveAni;
+    private int currentTargetIndex = 0;
+    private bool isMoving = false;
+    private bool onMove = false;
+    private Animator moveAni;
+    private Collider2D playerChackCol;
 
     private void Awake()
     {
-        moveAni = GetComponent<Animator>(); 
+        playerChackCol = GetComponent<Collider2D>();
+        moveAni = GetComponent<Animator>();
     }
 
     void Update()
     {
-        // 플레이어가 근처에 있고, 이동 중이 아닐 때만 이동 시작
         if (targets.Length > 0 && onMove && !isMoving)
         {
             StartCoroutine(MoveToNextTarget());
-
-            
         }
     }
 
     IEnumerator MoveToNextTarget()
     {
-        isMoving = true; // 이동 시작
+        isMoving = true;
 
         while (currentTargetIndex < targets.Length)
         {
             Transform currentTarget = targets[currentTargetIndex];
 
-            // ? 애니메이션 인덱스 적용
-            moveAni.SetInteger("MoveIndex", currentTargetIndex);
+            // 이동 방향 계산
+            Vector2 direction = (currentTarget.position - transform.position).normalized;
 
-            // 목표 지점까지 이동
+            // 방향을 정수형으로 정제 (가장 큰 축만 사용)
+            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+            {
+                direction = new Vector2(Mathf.Sign(direction.x), 0);
+            }
+            else
+            {
+                direction = new Vector2(0, Mathf.Sign(direction.y));
+            }
+
+            moveAni.SetFloat("MoveX", direction.x);
+            moveAni.SetFloat("MoveY", direction.y);
+            moveAni.SetBool("IsMoving", true);
+
             while (Vector2.Distance(transform.position, currentTarget.position) > 0.1f)
             {
                 if (!onMove)
                 {
-                    moveAni.SetInteger("MoveIndex", 0); // 대기 애니메이션으로
+                    moveAni.SetBool("IsMoving", false); // 애니메이션 중지
                     isMoving = false;
                     yield break;
                 }
@@ -56,15 +66,14 @@ public class NPCMove : MonoBehaviour
                 yield return null;
             }
 
-            // 도착 시 애니메이션 멈춤
-            moveAni.SetInteger("MoveIndex", 0); // 대기
+            // 도착 시 애니메이션 중지
+            moveAni.SetBool("IsMoving", false);
 
             // 텔레포트 체크
             Collider2D targetCollider = currentTarget.GetComponent<Collider2D>();
             if (targetCollider != null && targetCollider.CompareTag("telaport"))
             {
-                yield return new WaitForSeconds(0.5f); // 순간이동 전 대기
-
+                yield return new WaitForSeconds(0.5f);
                 if (currentTargetIndex + 1 < targets.Length)
                 {
                     transform.position = targets[currentTargetIndex + 1].position;
@@ -82,7 +91,6 @@ public class NPCMove : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 플레이어가 근처에 있을 때만 이동 시작
         if (collision.CompareTag("Player"))
         {
             onMove = true;
@@ -91,11 +99,9 @@ public class NPCMove : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        // 플레이어가 멀어지면 이동 중지
         if (collision.CompareTag("Player"))
         {
             onMove = false;
         }
     }
 }
-

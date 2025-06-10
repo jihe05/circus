@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -16,13 +15,15 @@ public class PlayerMove : MonoBehaviour
 
     [Header("상호작용")]
     Vector3 dirVec;
-    GameObject scanObject;
+    public GameObject scanObject;
 
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         moveAni = GetComponent<Animator>();
+
     }
+   
 
     private void Update()
     {
